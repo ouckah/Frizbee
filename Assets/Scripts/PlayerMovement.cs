@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovement : NetworkBehaviour
 {
     public float moveSpeed = 5.0f;    // Player movement speed
     public float sprintSpeed = 10.0f; // Player sprint speed
@@ -19,6 +20,8 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 lastPosition; // Store the object's last position without frisbee to calculate pivot distance
 
     private Rigidbody rb;
+    public GameObject cameraPrefab;
+    private NetworkObject cameraNetworkObject;
     public Transform cameraTransform;
 
     public float holdTime = 0.0f;  // time that user held down click (for frisbee power)
@@ -33,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
     private Transform throwingHand;
     public bool hasFrisbee = true;
 
+    ulong clientId;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -42,8 +47,20 @@ public class PlayerMovement : MonoBehaviour
         lastPosition = transform.position;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        Debug.Log("Player has spawned in.");
+    }
+
     void Update()
     {
+        if (!IsSpawned || !IsOwner)
+        {
+            return;
+        }
+
         // Sprint if shift key is down and not layed out
         if (!isLayedOut)
         {
@@ -126,6 +143,11 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!IsSpawned || !IsOwner)
+        {
+            return;
+        }
+
         // Get the movement input axis
         float hInput = Input.GetAxis("Horizontal");
         float vInput = Input.GetAxis("Vertical");
@@ -155,6 +177,11 @@ public class PlayerMovement : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
+        if (!IsSpawned)
+        {
+            return;
+        }
+
         if (collision.gameObject.tag == "Ground") 
         {
             isGrounded = true;

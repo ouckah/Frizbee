@@ -1,7 +1,10 @@
 using UnityEngine;
+using Unity.Netcode;
 
-public class ThirdPersonCamera : MonoBehaviour
+public class ThirdPersonCamera : NetworkBehaviour
 {
+    [SerializeField] private Camera thisCamera;
+
     public Transform target;    // Target to follow
     public float distance = 10.0f;    // Distance from target
     public float height = 5.0f;    // Height above target
