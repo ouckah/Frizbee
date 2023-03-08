@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 532956960647668968}
   - component: {fileID: 6517492359992985251}
   - component: {fileID: 6394386025217665863}
-  - component: {fileID: 6871667672506727559}
-  - component: {fileID: 5788638060866888443}
+  - component: {fileID: 8478188202502779558}
+  - component: {fileID: 948900495024569390}
   m_Layer: 0
   m_Name: Frisbee
   m_TagString: Untagged
@@ -152,7 +152,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &6871667672506727559
+--- !u!114 &8478188202502779558
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -170,15 +170,15 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   InLocalSpace: 0
   Interpolate: 1
---- !u!114 &5788638060866888443
+--- !u!114 &948900495024569390
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

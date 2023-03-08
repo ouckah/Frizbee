@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
 public class PlayerMovement : NetworkBehaviour
 {
@@ -32,11 +33,10 @@ public class PlayerMovement : NetworkBehaviour
 
     public Transform leftHand;
     public Transform rightHand;
-    public GameObject frisbeeVisual;
+    private GameObject frisbeeVisual;
+    public GameObject frisbeeVisualPrefab;
     private Transform throwingHand;
     public bool hasFrisbee = true;
-
-    ulong clientId;
 
     void Start()
     {
@@ -59,6 +59,14 @@ public class PlayerMovement : NetworkBehaviour
         if (!IsSpawned || !IsOwner)
         {
             return;
+        }
+
+        // Check if player has frisbee and doesn't have visual yet
+        if (hasFrisbee && frisbeeVisual == null)
+        {
+            // Spawn frisbee visual
+            frisbeeVisual = Instantiate(frisbeeVisualPrefab, throwingHand.position, Quaternion.identity, transform);
+            frisbeeVisual.GetComponent<NetworkObject>().Spawn();
         }
 
         // Sprint if shift key is down and not layed out
@@ -133,9 +141,9 @@ public class PlayerMovement : NetworkBehaviour
         {
             throwingHand = leftHand;
         }
-        if (hasFrisbee) frisbeeVisual.transform.position = throwingHand.transform.position;
+        if (hasFrisbee && frisbeeVisual != null) frisbeeVisual.transform.position = throwingHand.transform.position;
 
-        if (Input.GetKey(KeyCode.X))
+        if (Input.GetKey(KeyCode.X) && !hasFrisbee)
         {
             Catch();
         }
@@ -208,6 +216,9 @@ public class PlayerMovement : NetworkBehaviour
         // Spawn a new projectile at the position of the script object
         GameObject newProjectile = Instantiate(frisbeePrefab, throwingHand.position, Quaternion.identity);
 
+        // Spawn Network Object
+        newProjectile.GetComponent<NetworkObject>().Spawn();
+
         // Get the forward direction of the camera
         Vector3 throwDirection = Camera.main.transform.forward + Vector3.up * upwardForce;
 
@@ -219,17 +230,21 @@ public class PlayerMovement : NetworkBehaviour
         holdTime = Mathf.Clamp(holdTime, 1.0f, 2.0f);
         projectileRb.AddForce(throwDirection * (holdTime * holdTime) * launchForce, ForceMode.Impulse);
 
+        // Reset hold time
         holdTime = 0.0f;
 
         // Remove frisbee graphics + status
         hasFrisbee = false;
-        frisbeeVisual.SetActive(false);
+        frisbeeVisual.GetComponent<NetworkObject>().Despawn();
     }
 
     public void Catch()
     {
         lastPosition = transform.position;
         hasFrisbee = true;
-        frisbeeVisual.SetActive(true);
+        
+        // Spawn frisbee visual
+        frisbeeVisual = Instantiate(frisbeeVisualPrefab, throwingHand.position, Quaternion.identity, transform);
+        frisbeeVisual.GetComponent<NetworkObject>().Spawn();
     }
 }

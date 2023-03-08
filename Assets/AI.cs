@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 public class AI : MonoBehaviour
 {
@@ -32,8 +33,37 @@ public class AI : MonoBehaviour
 
     public void Throw()
     {
+        // // Spawn a new projectile at the position of the script object
+        // GameObject newProjectile = Instantiate(frisbeePrefab, throwingHand.position, Quaternion.identity);
+
+        // // Spawn Network Object
+        // newProjectile.GetComponent<NetworkObject>().Spawn();
+
+        // // Get the forward direction of the camera
+        // Vector3 throwDirection = transform.forward + Vector3.up * upwardForce;
+
+        // // Set the forward direction of the projectile to the camera forward direction
+        // newProjectile.transform.forward = transform.forward;
+
+        // // Apply a force to the projectile in the direction of the camera forward direction
+        // Rigidbody projectileRb = newProjectile.GetComponent<Rigidbody>();
+        // projectileRb.AddForce(throwDirection * launchForce, ForceMode.Impulse);
+
+        ThrowFrisbeeServerRpc(throwingHand);
+
+        // Remove frisbee graphics + status
+        hasFrisbee = false;
+        frisbeeVisual.SetActive(false);
+    }
+
+    [ServerRpc]
+    private void ThrowFrisbeeServerRpc(Transform throwingPoint)
+    {
         // Spawn a new projectile at the position of the script object
         GameObject newProjectile = Instantiate(frisbeePrefab, throwingHand.position, Quaternion.identity);
+
+        // Spawn Network Object
+        newProjectile.GetComponent<NetworkObject>().Spawn();
 
         // Get the forward direction of the camera
         Vector3 throwDirection = transform.forward + Vector3.up * upwardForce;
@@ -44,10 +74,6 @@ public class AI : MonoBehaviour
         // Apply a force to the projectile in the direction of the camera forward direction
         Rigidbody projectileRb = newProjectile.GetComponent<Rigidbody>();
         projectileRb.AddForce(throwDirection * launchForce, ForceMode.Impulse);
-
-        // Remove frisbee graphics + status
-        hasFrisbee = false;
-        frisbeeVisual.SetActive(false);
     }
 
     public void Catch()

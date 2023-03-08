@@ -27,6 +27,11 @@ public class ThirdPersonCamera : NetworkBehaviour
 
     void LateUpdate()
     {
+        if (!IsOwner)
+        {
+            GetComponent<Camera>().enabled = false;
+            return;
+        }
         // Calculate desired camera position and rotation based on input
         yaw += lookSpeed * Input.GetAxis("Mouse X");
         pitch += lookSpeed * Input.GetAxis("Mouse Y");
