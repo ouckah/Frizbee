@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class FrisbeeProjectile : MonoBehaviour
 {
-    public float speed = 1.0f;    // Speed of the frisbee
+    public float collisionSpeedReduction = 0.3f; // Rate in which the frisbee loses speed on collision
     public float torque = 10.0f;    // Torque applied to the frisbee
     public float lift = 1.0f;    // Lift force applied to the frisbee
     public float gravity = -9.81f;    // Gravity force applied to the frisbee
+
+    public bool isGrounded = false;
+    public float timeToDestroy = 2f;
 
     private Rigidbody rb;
 
@@ -19,7 +22,7 @@ public class FrisbeeProjectile : MonoBehaviour
     {
         // Apply lift force to the frisbee based on its velocity
         Vector3 relativeVelocity = transform.InverseTransformDirection(rb.velocity);
-        float liftAngle = Mathf.Clamp(relativeVelocity.y / speed, -1.0f, 1.0f) * Mathf.PI / 2.0f;
+        float liftAngle = Mathf.Clamp(relativeVelocity.y, -1.0f, 1.0f) * Mathf.PI / 2.0f;
         Vector3 liftVector = Vector3.up * Mathf.Cos(liftAngle) + transform.forward * Mathf.Sin(liftAngle);
         rb.AddForce(lift * liftVector);
 
@@ -36,7 +39,47 @@ public class FrisbeeProjectile : MonoBehaviour
     void Update()
     {
         // Move the frisbee forward
-        Vector3 movement = transform.forward * speed * Time.deltaTime;
+        Vector3 movement = transform.forward * Time.deltaTime;
         rb.MovePosition(rb.position + movement);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        // Reduce velocity of the projectile upon collision
+        rb.velocity *= collisionSpeedReduction;
+
+        // Check if the projectile has collided with the ground
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            // set grounded property to true
+            isGrounded = true;
+
+            // Destroy the projectile object after a delay
+            Destroy(gameObject, timeToDestroy);
+        }
+
+        // Check if the projectile has collided with an AI (and hasn't already touched the ground)
+        if (collision.gameObject.GetComponent<AI>() != null && !isGrounded)
+        {
+            AI ai = collision.gameObject.GetComponent<AI>();
+
+            // Destroy the projectile object instantly
+            Destroy(gameObject);
+
+            // Trigger "catch" method
+            ai.Catch();
+        }
+
+        // Check if the projectile has collided with an Player (and hasn't already touched the ground)
+        if (collision.gameObject.GetComponent<Player>() != null && !isGrounded)
+        {
+            Player player = collision.gameObject.GetComponent<Player>();
+
+            // Destroy the projectile object instantly
+            Destroy(gameObject);
+
+            // Trigger "catch" method
+            player.Catch();
+        }
     }
 }

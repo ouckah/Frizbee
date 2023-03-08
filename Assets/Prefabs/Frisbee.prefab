@@ -98,10 +98,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eeb82e064a1f0ec47be9d6624cadd781, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 10
+  collisionSpeedReduction: 0.3
   torque: 10
   lift: 6
-  gravity: -9.81
+  gravity: -8
+  isGrounded: 0
+  timeToDestroy: 1.5
 --- !u!54 &532956960647668968
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -112,7 +114,7 @@ Rigidbody:
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
-  m_AngularDrag: 0.05
+  m_AngularDrag: 1
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0

@@ -27,7 +27,7 @@ public class ThirdPersonCamera : MonoBehaviour
         // Calculate desired camera position and rotation based on input
         yaw += lookSpeed * Input.GetAxis("Mouse X");
         pitch += lookSpeed * Input.GetAxis("Mouse Y");
-        pitch = Mathf.Clamp(pitch, -45.0f, 15.0f);    // Limit pitch angle to prevent flipping
+        pitch = Mathf.Clamp(pitch, -45.0f, 9.0f);    // Limit pitch angle to prevent flipping
 
         Vector3 desiredPosition = target.position + Quaternion.Euler(pitch, yaw, 0.0f) * -offset;
         Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
