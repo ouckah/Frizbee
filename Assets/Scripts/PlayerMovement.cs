@@ -19,8 +19,7 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 lastPosition; // Store the object's last position without frisbee to calculate pivot distance
 
     private Rigidbody rb;
-    public Animator anim;
-    private Transform cameraTransform;
+    public Transform cameraTransform;
 
     public float holdTime = 0.0f;  // time that user held down click (for frisbee power)
     private bool isHolding = false;
@@ -37,8 +36,6 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        anim = GetComponent<Animator>();
-        cameraTransform = Camera.main.transform;
 
         throwingHand = rightHand;
 
