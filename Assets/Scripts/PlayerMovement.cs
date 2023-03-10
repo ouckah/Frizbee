@@ -253,20 +253,24 @@ public class PlayerMovement : NetworkBehaviour
         projectileRb.AddForce(throwDirection * (time * time) * launchForce, ForceMode.Impulse);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SpawnFrisbeeVisualServerRpc()
     {
         // Make sure server knows frisbee is active
+        lastPosition = transform.position;
+        hasFrisbee = true;
         frisbeeVisual.SetActive(true);
 
         // Make sure other clients know frisbee is active
         SpawnFrisbeeVisualClientRpc();
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void DespawnFrisbeeVisualServerRpc()
     {
         // Make sure server knows frisbee is hidden
+        lastPosition = transform.position;
+        hasFrisbee = false;
         frisbeeVisual.SetActive(false);
 
         // Make sure other clients know frisbee is hidden
@@ -277,6 +281,8 @@ public class PlayerMovement : NetworkBehaviour
     private void SpawnFrisbeeVisualClientRpc()
     {
         // Make sure clients knows frisbee is active
+        lastPosition = transform.position;
+        hasFrisbee = true;
         frisbeeVisual.SetActive(true);
     }
 
@@ -284,6 +290,8 @@ public class PlayerMovement : NetworkBehaviour
     private void DespawnFrisbeeVisualClientRpc()
     {
         // Make sure clients knows frisbee is hidden
+        lastPosition = transform.position;
+        hasFrisbee = false;
         frisbeeVisual.SetActive(false);
     }
 }

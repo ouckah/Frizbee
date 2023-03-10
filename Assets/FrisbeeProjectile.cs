@@ -1,4 +1,5 @@
 using UnityEngine;
+using Unity.Netcode;
 
 public class FrisbeeProjectile : MonoBehaviour
 {
@@ -43,7 +44,7 @@ public class FrisbeeProjectile : MonoBehaviour
         rb.MovePosition(rb.position + movement);
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider collision)
     {
         // Reduce velocity of the projectile upon collision
         rb.velocity *= collisionSpeedReduction;
@@ -75,15 +76,15 @@ public class FrisbeeProjectile : MonoBehaviour
         {
             Player player = collision.gameObject.GetComponent<Player>();
 
-            // Destroy the projectile object instantly
-            Destroy(gameObject);
+            Debug.Log("A frisbee has collided with a player!");
 
-            // ONLY if player doesn't already have a frisbee
-            if (!player.gameObject.GetComponent<PlayerMovement>().hasFrisbee) // TODO: HORRIBLE code please fix this please
-            {
-                // Trigger "catch" method
-                player.Catch();
-            }
+            // Trigger "catch" method
+            player.Catch();
+
+            Debug.Log("A player has caught a frisbee!");
+
+            // Destroy the projectile object instantly
+            GetComponent<NetworkObject>().Despawn();
         }
     }
 }
