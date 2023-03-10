@@ -982,11 +982,6 @@ MonoBehaviour:
     PlayerPrefab: {fileID: 6842639361088824334, guid: b81f0167dc28ee4499d30b41b3e00eb6, type: 3}
     NetworkPrefabs:
     - Override: 0
-      Prefab: {fileID: 6842639361088824334, guid: b81f0167dc28ee4499d30b41b3e00eb6, type: 3}
-      SourcePrefabToOverride: {fileID: 0}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
       Prefab: {fileID: 532956960647668969, guid: d6d90e1dde87a764e9336ecbfaf85e58, type: 3}
       SourcePrefabToOverride: {fileID: 0}
       SourceHashToOverride: 0

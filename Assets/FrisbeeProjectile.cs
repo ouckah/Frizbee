@@ -78,8 +78,12 @@ public class FrisbeeProjectile : MonoBehaviour
             // Destroy the projectile object instantly
             Destroy(gameObject);
 
-            // Trigger "catch" method
-            player.Catch();
+            // ONLY if player doesn't already have a frisbee
+            if (!player.gameObject.GetComponent<PlayerMovement>().hasFrisbee) // TODO: HORRIBLE code please fix this please
+            {
+                // Trigger "catch" method
+                player.Catch();
+            }
         }
     }
 }

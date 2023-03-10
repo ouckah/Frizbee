@@ -33,8 +33,7 @@ public class PlayerMovement : NetworkBehaviour
 
     public Transform leftHand;
     public Transform rightHand;
-    private GameObject frisbeeVisual;
-    public GameObject frisbeeVisualPrefab;
+    public GameObject frisbeeVisual;
     private Transform throwingHand;
     public bool hasFrisbee = true;
 
@@ -56,17 +55,14 @@ public class PlayerMovement : NetworkBehaviour
 
     void Update()
     {
-        if (!IsSpawned || !IsOwner)
-        {
-            return;
-        }
+        if (!IsSpawned || !IsOwner) return;
 
         // Check if player has frisbee and doesn't have visual yet
         if (hasFrisbee && frisbeeVisual == null)
         {
-            // Spawn frisbee visual
-            frisbeeVisual = Instantiate(frisbeeVisualPrefab, throwingHand.position, Quaternion.identity, transform);
-            frisbeeVisual.GetComponent<NetworkObject>().Spawn();
+            // Show frisbee visual
+            frisbeeVisual.SetActive(true);
+            SpawnFrisbeeVisualServerRpc();
         }
 
         // Sprint if shift key is down and not layed out
@@ -151,10 +147,7 @@ public class PlayerMovement : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!IsSpawned || !IsOwner)
-        {
-            return;
-        }
+        if (!IsSpawned || !IsOwner) return;
 
         // Get the movement input axis
         float hInput = Input.GetAxis("Horizontal");
@@ -212,6 +205,35 @@ public class PlayerMovement : NetworkBehaviour
     public void Throw()
     {
         isHolding = false;
+        
+        // Hide frisbee visual
+        frisbeeVisual.SetActive(false);
+        ThrowFrisbeeServerRpc(holdTime);
+        DespawnFrisbeeVisualServerRpc();
+
+        // Reset hold time
+        holdTime = 0.0f;
+
+        // Remove status
+        hasFrisbee = false;
+    }
+
+    public void Catch()
+    {
+        lastPosition = transform.position;
+        hasFrisbee = true;
+        
+        // Show frisbee visual
+        frisbeeVisual.SetActive(true);
+        SpawnFrisbeeVisualServerRpc();
+
+        Debug.Log(OwnerClientId + " caught the frisbee!");
+    }
+
+    [ServerRpc]
+    private void ThrowFrisbeeServerRpc(float time)
+    {
+        Debug.Log(OwnerClientId + " threw a frisbee!");
 
         // Spawn a new projectile at the position of the script object
         GameObject newProjectile = Instantiate(frisbeePrefab, throwingHand.position, Quaternion.identity);
@@ -220,31 +242,48 @@ public class PlayerMovement : NetworkBehaviour
         newProjectile.GetComponent<NetworkObject>().Spawn();
 
         // Get the forward direction of the camera
-        Vector3 throwDirection = Camera.main.transform.forward + Vector3.up * upwardForce;
+        Vector3 throwDirection = cameraTransform.forward + Vector3.up * upwardForce;
 
         // Set the forward direction of the projectile to the camera forward direction
-        newProjectile.transform.forward = Camera.main.transform.forward;
+        newProjectile.transform.forward = cameraTransform.forward;
 
         // Apply a force to the projectile in the direction of the camera forward direction
         Rigidbody projectileRb = newProjectile.GetComponent<Rigidbody>();
-        holdTime = Mathf.Clamp(holdTime, 1.0f, 2.0f);
-        projectileRb.AddForce(throwDirection * (holdTime * holdTime) * launchForce, ForceMode.Impulse);
-
-        // Reset hold time
-        holdTime = 0.0f;
-
-        // Remove frisbee graphics + status
-        hasFrisbee = false;
-        frisbeeVisual.GetComponent<NetworkObject>().Despawn();
+        time = Mathf.Clamp(time, 1.0f, 2.0f);
+        projectileRb.AddForce(throwDirection * (time * time) * launchForce, ForceMode.Impulse);
     }
 
-    public void Catch()
+    [ServerRpc]
+    private void SpawnFrisbeeVisualServerRpc()
     {
-        lastPosition = transform.position;
-        hasFrisbee = true;
-        
-        // Spawn frisbee visual
-        frisbeeVisual = Instantiate(frisbeeVisualPrefab, throwingHand.position, Quaternion.identity, transform);
-        frisbeeVisual.GetComponent<NetworkObject>().Spawn();
+        // Make sure server knows frisbee is active
+        frisbeeVisual.SetActive(true);
+
+        // Make sure other clients know frisbee is active
+        SpawnFrisbeeVisualClientRpc();
+    }
+
+    [ServerRpc]
+    private void DespawnFrisbeeVisualServerRpc()
+    {
+        // Make sure server knows frisbee is hidden
+        frisbeeVisual.SetActive(false);
+
+        // Make sure other clients know frisbee is hidden
+        DespawnFrisbeeVisualClientRpc();
+    }
+
+    [ClientRpc]
+    private void SpawnFrisbeeVisualClientRpc()
+    {
+        // Make sure clients knows frisbee is active
+        frisbeeVisual.SetActive(true);
+    }
+
+    [ClientRpc]
+    private void DespawnFrisbeeVisualClientRpc()
+    {
+        // Make sure clients knows frisbee is hidden
+        frisbeeVisual.SetActive(false);
     }
 }
