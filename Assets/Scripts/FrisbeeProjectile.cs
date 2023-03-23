@@ -72,9 +72,9 @@ public class FrisbeeProjectile : MonoBehaviour
         }
 
         // Check if the projectile has collided with an Player (and hasn't already touched the ground)
-        if (collision.gameObject.GetComponent<Player>() != null && !isGrounded)
+        if (collision.gameObject.GetComponent<PlayerObj>() != null && !isGrounded)
         {
-            Player player = collision.gameObject.GetComponent<Player>();
+            PlayerObj player = collision.gameObject.GetComponent<PlayerObj>();
 
             Debug.Log("A frisbee has collided with a player!");
 
