@@ -1,7 +1,8 @@
 using UnityEngine;
 using Unity.Netcode;
+using Unity.Netcode.Components;
 
-public class FrisbeeProjectile : MonoBehaviour
+public class FrisbeeProjectile : NetworkBehaviour
 {
     public float collisionSpeedReduction = 0.3f; // Rate in which the frisbee loses speed on collision
     public float torque = 10.0f;    // Torque applied to the frisbee
@@ -46,17 +47,16 @@ public class FrisbeeProjectile : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
+        if (!IsServer) return;
+
         // Reduce velocity of the projectile upon collision
         rb.velocity *= collisionSpeedReduction;
 
         // Check if the projectile has collided with the ground
         if (collision.gameObject.CompareTag("Ground"))
         {
-            // set grounded property to true
-            isGrounded = true;
-
-            // Destroy the projectile object after a delay
-            Destroy(gameObject, timeToDestroy);
+            // Destroy the frisbee
+            DestroyFrisbeeServerRpc();
         }
 
         // Check if the projectile has collided with an AI (and hasn't already touched the ground)
@@ -64,17 +64,17 @@ public class FrisbeeProjectile : MonoBehaviour
         {
             AI ai = collision.gameObject.GetComponent<AI>();
 
-            // Destroy the projectile object instantly
-            Destroy(gameObject);
+            // Destroy the frisbee
+            DestroyFrisbeeServerRpc();
 
             // Trigger "catch" method
             ai.Catch();
         }
 
         // Check if the projectile has collided with an Player (and hasn't already touched the ground)
-        if (collision.gameObject.GetComponent<PlayerObj>() != null && !isGrounded)
+        if (collision.gameObject.GetComponent<PlayerObject>() != null && !isGrounded)
         {
-            PlayerObj player = collision.gameObject.GetComponent<PlayerObj>();
+            PlayerObject player = collision.gameObject.GetComponent<PlayerObject>();
 
             Debug.Log("A frisbee has collided with a player!");
 
@@ -86,5 +86,19 @@ public class FrisbeeProjectile : MonoBehaviour
             // Destroy the projectile object instantly
             GetComponent<NetworkObject>().Despawn();
         }
+    }
+
+    [ServerRpc]
+    private void DestroyFrisbeeServerRpc()
+    {
+        DestroyFrisbeeClientRpc();
+    }
+
+    [ClientRpc]
+    private void DestroyFrisbeeClientRpc()
+    {   
+        isGrounded = true;
+
+        GetComponent<NetworkObject>().Despawn();
     }
 }

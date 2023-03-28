@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerObj : MonoBehaviour
+public class PlayerObject : MonoBehaviour
 {
 
     private PlayerMovement controller;

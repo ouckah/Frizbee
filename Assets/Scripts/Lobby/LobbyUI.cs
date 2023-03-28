@@ -19,6 +19,8 @@ public class LobbyUI : MonoBehaviour {
     [SerializeField] private Button changeMarineButton;
     [SerializeField] private Button changeNinjaButton;
     [SerializeField] private Button changeZombieButton;
+    [SerializeField] private Button changeTeamOneButton;
+    [SerializeField] private Button changeTeamTwoButton;
     [SerializeField] private Button leaveLobbyButton;
     [SerializeField] private Button startGameButton;
 
@@ -36,6 +38,13 @@ public class LobbyUI : MonoBehaviour {
         });
         changeZombieButton.onClick.AddListener(() => {
             LobbyManager.Instance.UpdatePlayerCharacter(LobbyManager.PlayerCharacter.Zombie);
+        });
+
+        changeTeamOneButton.onClick.AddListener(() => {
+            LobbyManager.Instance.UpdatePlayerTeam("1");
+        });
+        changeTeamTwoButton.onClick.AddListener(() => {
+            LobbyManager.Instance.UpdatePlayerTeam("2");
         });
 
         leaveLobbyButton.onClick.AddListener(() => {
